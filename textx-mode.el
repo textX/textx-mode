@@ -27,11 +27,9 @@
 
 (defconst textx-mode-syntax-table
   (let ((table (make-syntax-table)))
-    ;; / is punctuation, but // is a comment starter
-    (modify-syntax-entry ?/ ". 12")
-    ;; \n is a comment ender
-    (modify-syntax-entry ?\n ">"))
-  table)
+    (c-populate-syntax-table table)
+    table)
+  "Syntax table used in `textx-mode' buffers.")
 
 (define-derived-mode textx-mode prog-mode "textX"
   :syntax-table textx-mode-syntax-table
