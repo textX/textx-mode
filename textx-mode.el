@@ -67,7 +67,10 @@
               '((textx-font-lock-keywords)))
   )
 
-;; Not needed anymore
+;; Activate textx-mode for files with .tx extension
+(add-to-list 'auto-mode-alist (cons (purecopy "\\.tx\\'")  'textx-mode))
+
+;; Release as not needed anymore
 (setq textx-keywords nil)
 (setq textx-keywords-regexp nil)
 (setq textx-base-types nil)
