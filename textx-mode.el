@@ -27,13 +27,59 @@
 
 (defconst textx-mode-syntax-table
   (let ((table (make-syntax-table)))
-    (c-populate-syntax-table table)
+    ;; (c-populate-syntax-table table)
+    (modify-syntax-entry ?_ "w" table)
+    (modify-syntax-entry ?/ "\". 124b" table)
+    (modify-syntax-entry ?* ". 23" table)
+    (modify-syntax-entry ?\n "> b" table)
+    (modify-syntax-entry ?' "\"" table)
+    (modify-syntax-entry ?\" "\"" table)
     table)
   "Syntax table used in `textx-mode' buffers.")
 
-(define-derived-mode textx-mode prog-mode "textX"
+(setq-local comment-start "// ")
+
+(setq textx-keywords '("import"
+                       "eolterm"
+                       "ws"
+                       "skipws"
+                       "noskipws"
+                       ))
+(setq textx-base-types '("BASETYPE" "STRING" "INT" "FLOAT" "BOOL" "ID"))
+(setq textx-operators '("=" "+=" "*=" "?=" "*" "+" "?"))
+
+
+(setq textx-keywords-regexp (regexp-opt textx-keywords 'words))
+(setq textx-base-types-regexp (regexp-opt textx-base-types 'words))
+(setq textx-operators-regexp (regexp-opt textx-operators 'symbol))
+
+
+(setq textx-font-lock-keywords
+      `(
+        (,textx-base-types-regexp . font-lock-type-face)
+        (,textx-keywords-regexp . font-lock-keyword-face)
+        (,textx-operators-regexp . font-lock-keyword-face)
+        ))
+
+(define-derived-mode textx-mode fundamental-mode "textX"
   :syntax-table textx-mode-syntax-table
-  (font-lock-ensure))
+  (setq-local font-lock-defaults
+              '((textx-font-lock-keywords)))
+  )
+
+;; Activate textx-mode for files with .tx extension
+(add-to-list 'auto-mode-alist (cons (purecopy "\\.tx\\'")  'textx-mode))
+
+;; Release as not needed anymore
+(setq textx-keywords nil)
+(setq textx-keywords-regexp nil)
+(setq textx-base-types nil)
+(setq textx-base-types-regexp nil)
+
 
 (provide 'textx-mode)
+
+;; coding: utf-8
+
 ;;; textx-mode.el ends here
+
