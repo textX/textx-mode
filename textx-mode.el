@@ -1,8 +1,8 @@
-;;; textx-mode.el --- Major mode for editing textX   -*- lexical-binding: t; -*-
+;;; textx-mode.el --- Major mode for editing TextX files   -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015  Novak Boskov
+;; Copyright (C) 2015-2016 TextX contributors.
 
-;; Author: Novak Boskov <gnovak.boskov@gmail.com>
+;; Author: Novak Boškov <gnovak.boskov@gmail.com>
 ;; Keywords: textx
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -25,9 +25,21 @@
 
 ;;; Code:
 
+(defcustom textx-tab-width 4
+  "Tab width in TextX code."
+  :type '(integer)
+  :group 'textx)
+
+(defvar textx-mode-hook nil
+  "Hooks to be ran on mode initialization.")
+
+(defvar textx-mode-map
+  (let ((map (make-sparse-keymap)))
+    map)
+  "Keymap for TextX major mode.")
+
 (defconst textx-mode-syntax-table
   (let ((table (make-syntax-table)))
-    ;; (c-populate-syntax-table table)
     (modify-syntax-entry ?_ "w" table)
     (modify-syntax-entry ?/ "\". 124b" table)
     (modify-syntax-entry ?* ". 23" table)
@@ -35,51 +47,72 @@
     (modify-syntax-entry ?' "\"" table)
     (modify-syntax-entry ?\" "\"" table)
     table)
-  "Syntax table used in `textx-mode' buffers.")
+  "Syntax table used in TextX buffers.")
 
-(setq-local comment-start "// ")
+(defconst textx-keywords '("import"
+                           "eolterm"
+                           "ws"
+                           "skipws"
+                           "noskipws"))
 
-(setq textx-keywords '("import"
-                       "eolterm"
-                       "ws"
-                       "skipws"
-                       "noskipws"
-                       ))
-(setq textx-base-types '("BASETYPE" "STRING" "INT" "FLOAT" "BOOL" "ID"))
-(setq textx-operators '("=" "+=" "*=" "?=" "*" "+" "?"))
+(defconst textx-base-types '("BASETYPE"
+                             "STRING"
+                             "INT"
+                             "FLOAT"
+                             "BOLO"
+                             "ID"))
 
+(defconst textx-operators '("=" "+=" "*=" "?=" "*" "+" "?"))
 
-(setq textx-keywords-regexp (regexp-opt textx-keywords 'words))
-(setq textx-base-types-regexp (regexp-opt textx-base-types 'words))
-(setq textx-operators-regexp (regexp-opt textx-operators 'symbol))
+(defvar textx-font-lock-keywords
+  (list
+   (cons (regexp-opt textx-keywords 'words) font-lock-keyword-face)
+   (cons (regexp-opt textx-base-types 'words) font-lock-type-face)
+   (cons (regexp-opt textx-operators 'symbol) font-lock-keyword-face)))
 
+(defun textx-indent-line ()
+  "Indent current line as TextX code."
+  (interactive)
+  (let ((savep (> (current-column) (current-indentation)))
+        (indent (condition-case nil (max (textx-calculate-indentation) 0)
+                  (error 0))))
+    (if savep
+        (save-excursion (indent-line-to indent))
+      (indent-line-to indent))))
 
-(setq textx-font-lock-keywords
-      `(
-        (,textx-base-types-regexp . font-lock-type-face)
-        (,textx-keywords-regexp . font-lock-keyword-face)
-        (,textx-operators-regexp . font-lock-keyword-face)
-        ))
+(defun textx-calculate-indentation ()
+  "Calculates desired indentation of a line."
+  ;; TODO: This requires deeper analysis.
+  (save-excursion
+    (beginning-of-line)
+    (cond
+     ;; Definitions and definitions ends are considered as top level
+     ((or (looking-at "^[ \t]*\\([A-Z][a-z0-9]+\\)+:$")
+          (looking-at "^[ \t]*;$"))
+      0)
+     ;; Everything else is indented for one tab.
+     (t textx-tab-width))))
 
-(define-derived-mode textx-mode fundamental-mode "textX"
+(defvar textx-imenu-generic-expression
+  ;; Everything that match this regexp is considered as TextX term definition.
+  ;; `imenu-generic-expression' works only for top level forms.
+  '(("Definition" "^\\([A-Z][a-z0-9]+\\)+:$" 1))
+  ;; For more versatile or structured `imenu' a parser function
+  ;; `imenu-create-index-function' should be used.
+  "Value for `imenu-generic-expression' in TextX mode.")
+
+;;;###autoload
+(define-derived-mode textx-mode prog-mode "textX"
   :syntax-table textx-mode-syntax-table
-  (setq-local font-lock-defaults
-              '((textx-font-lock-keywords)))
-  )
+  (setq-local font-lock-defaults '(textx-font-lock-keywords))
+  (setq-local comment-start "// ")
+  (setq-local indent-line-function 'textx-indent-line)
+  (setq-local imenu-generic-expression textx-imenu-generic-expression))
 
 ;; Activate textx-mode for files with .tx extension
-(add-to-list 'auto-mode-alist (cons (purecopy "\\.tx\\'")  'textx-mode))
-
-;; Release as not needed anymore
-(setq textx-keywords nil)
-(setq textx-keywords-regexp nil)
-(setq textx-base-types nil)
-(setq textx-base-types-regexp nil)
-
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.tx\\'" . textx-mode))
 
 (provide 'textx-mode)
 
-;; coding: utf-8
-
 ;;; textx-mode.el ends here
-
