@@ -6,7 +6,7 @@
 ;; URL: https://github.com/novakboskov/textx-mode
 ;; Keywords: textx
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "25.1"))
+;; Package-Requires: ((emacs "24.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
