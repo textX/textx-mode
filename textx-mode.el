@@ -28,18 +28,16 @@
 
 ;;; Code:
 
+(defgroup textx nil
+  "Major mode for editing TextX code."
+  :prefix "textx-"
+  :group 'languages
+  :link '(url-link :tag "Github" "https://github.com/novakboskov/textx-mode"))
+
 (defcustom textx-tab-width 4
   "Tab width in TextX code."
   :type '(integer)
   :group 'textx)
-
-(defvar textx-mode-hook nil
-  "Hooks to be ran on mode initialization.")
-
-(defvar textx-mode-map
-  (let ((map (make-sparse-keymap)))
-    map)
-  "Keymap for TextX major mode.")
 
 (defconst textx-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -107,7 +105,7 @@
 ;;;###autoload
 (define-derived-mode textx-mode prog-mode "textX"
   :syntax-table textx-mode-syntax-table
-  (setq-local font-lock-defaults '(textx-font-lock-keywords))
+  (setq font-lock-defaults '(textx-font-lock-keywords))
   (setq-local comment-start "// ")
   (setq-local indent-line-function 'textx-indent-line)
   (setq-local imenu-generic-expression textx-imenu-generic-expression))
