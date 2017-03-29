@@ -58,10 +58,11 @@
 
 (defconst textx-base-types '("BASETYPE"
                              "STRING"
+                             "NUMBER"
+                             "BOOL"
+                             "ID"
                              "INT"
-                             "FLOAT"
-                             "BOLO"
-                             "ID"))
+                             "FLOAT"))
 
 (defconst textx-operators '("=" "+=" "*=" "?=" "*" "+" "?"))
 
