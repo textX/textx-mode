@@ -42,9 +42,9 @@
 (defconst textx-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?_ "w" table)
-    (modify-syntax-entry ?/ "\". 124b" table)
-    (modify-syntax-entry ?* ". 23" table)
-    (modify-syntax-entry ?\n "> b" table)
+    (modify-syntax-entry ?/ ". 124" table)
+    (modify-syntax-entry ?* ". 23b" table)
+    (modify-syntax-entry ?\n ">" table)
     (modify-syntax-entry ?' "\"" table)
     (modify-syntax-entry ?\" "\"" table)
     table)
@@ -64,7 +64,7 @@
                              "INT"
                              "FLOAT"))
 
-(defconst textx-operators '("=" "+=" "*=" "?=" "*" "+" "?"))
+(defconst textx-operators '("=" "+=" "*=" "?=" "*" "+" "?" "#"))
 
 (defvar textx-font-lock-keywords
   (list
