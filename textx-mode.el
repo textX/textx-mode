@@ -103,7 +103,7 @@
 (defvar textx-imenu-generic-expression
   ;; Everything that match this regexp is considered as TextX term definition.
   ;; `imenu-generic-expression' works only for top level forms.
-  '(("Definition" "^\\([A-Z][a-z0-9]+\\)+:$" 1))
+  '(("Definition" "^\\s-*\\(\\sw+\\)\\s-*:\\s-*$" 1))
   ;; For more versatile or structured `imenu' a parser function
   ;; `imenu-create-index-function' should be used.
   "Value for `imenu-generic-expression' in TextX mode.")
